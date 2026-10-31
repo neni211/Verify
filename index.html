@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Verify — Yaş Doğrulama</title>
+<style>
+:root{
+  --site-primary:#111827;
+  --site-secondary:#0f172a;
+  --site-background:#f8fafc;
+  --site-on-primary:#ffffff;
+  --site-on-secondary:#ffffff;
+  --site-on-background:#0f172a;
+  --site-font-body:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --site-font-heading:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --site-heading-scale:1;
+  --site-spacing-scale:1;
+  --site-radius-scale:1;
+  --site-decoration-opacity:1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:var(--site-font-body)}
+body{background:var(--site-background);color:var(--site-on-background)}
+#app{
+  min-height:100vh;
+  background-color:var(--site-background);
+  color:var(--site-on-background);
+  display:flex;
+  flex-direction:column;
+}
+header{
+  width:100%;
+  border-bottom:1px solid #e5e7eb;
+  background:#ffffff;
+}
+.nav{
+  max-width:980px;margin:auto;padding:18px 22px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{font-weight:800;letter-spacing:-.04em;font-size:20px}
+.badge{font-size:12px;color:#64748b;background:#f1f5f9;padding:7px 10px;border-radius:999px}
+main{
+  width:min(92%,560px);margin:auto;padding:48px 0 56px;
+}
+.card{
+  background:#fff;border:1px solid #e2e8f0;
+  border-radius:calc(20px * var(--site-radius-scale));
+  padding:clamp(24px,5vw,40px);
+  box-shadow:0 18px 45px rgba(15,23,42,.06);
+}
+.step{display:none}.step.active{display:block}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--site-primary);font-weight:800}
+h1{
+  font-family:var(--site-font-heading);
+  font-size:calc(clamp(27px,6vw,38px) * var(--site-heading-scale));
+  line-height:1.08;letter-spacing:-.04em;margin:10px 0 12px;
+}
+p{line-height:1.6;color:#64748b;margin:0 0 26px}
+.icon{
+  width:64px;height:64px;border-radius:18px;background:#eff6ff;
+  display:grid;place-items:center;font-size:30px;margin-bottom:22px;
+}
+.action{
+  width:100%;border:0;border-radius:12px;padding:15px 18px;
+  background:var(--site-primary);color:var(--site-on-primary);
+  font-size:15px;font-weight:750;cursor:pointer;
+}
+.action:hover{filter:brightness(.96)}
+.secondary{
+  width:100%;border:1px solid #dbe2ea;background:#fff;color:#334155;
+  border-radius:12px;padding:14px 18px;margin-top:10px;font-weight:650;cursor:pointer;
+}
+.action:disabled,.secondary:disabled{opacity:.5;cursor:not-allowed}
+.status{
+  margin:20px 0;padding:14px;border-radius:12px;background:#f8fafc;
+  color:#475569;font-size:14px;display:none;
+}
+.status.show{display:block}
+.progress{display:flex;gap:7px;margin-bottom:28px}
+.dot{height:5px;flex:1;border-radius:99px;background:#e2e8f0}
+.dot.done,.dot.current{background:var(--site-primary)}
+.camera{
+  aspect-ratio:4/3;border-radius:16px;background:#0f172a;display:grid;
+  place-items:center;color:#cbd5e1;margin:18px 0;overflow:hidden;position:relative;
+}
+.camera span{font-size:46px;opacity:.8}
+.camera video{width:100%;height:100%;object-fit:cover;display:none}
+.camera.live video{display:block}
+.camera.live span{display:none}
+.camera small{position:absolute;bottom:14px;background:#0008;padding:7px 10px;border-radius:8px}
+.success{text-align:center}
+.check{
+  width:74px;height:74px;margin:0 auto 20px;border-radius:50%;
+  background:#dcfce7;color:#15803d;display:grid;place-items:center;font-size:38px;
+}
+.notice{
+  font-size:12px;color:#94a3b8;margin-top:18px;text-align:center;line-height:1.5
+}
+footer{margin-top:auto;text-align:center;padding:18px;color:#94a3b8;font-size:12px}
+@media (max-width:520px){
+  .nav{padding:15px 16px}
+  main{width:min(94%,560px);padding:28px 0 34px}
+  .card{padding:23px 20px}
+}
+@media (prefers-color-scheme:dark){
+  #app{background:#0b1220;color:#f8fafc}
+  header,.card{background:#111827;border-color:#263244}
+  .badge{background:#1e293b;color:#cbd5e1}
+  p{color:#94a3b8}.secondary{background:#111827;color:#e2e8f0;border-color:#334155}
+  .status{background:#172033;color:#cbd5e1}
+  .dot{background:#334155}.icon{background:#172554}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<header><div class="nav"><div class="logo">Verify</div><div class="badge">Güvenli doğrulama</div></div></header>
+
+<main>
+<div class="progress" aria-label="Doğrulama adımları">
+  <div class="dot current" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+</div>
+
+<section class="card step active" id="step1">
+  <div class="icon">NFC</div>
+  <div class="eyebrow">Adım 1 · Kimlik doğrulama</div>
+  <h1>Kimliğini doğrula</h1>
+  <p>Kimlik kartını telefonunun NFC alanına yaklaştır. Kartın üzerindeki bilgiler güvenli şekilde kontrol edilecektir.</p>
+  <button class="action" id="nfcBtn">NFC desteğini kontrol et</button>
+  <div class="status" id="nfcStatus"></div>
+  <div class="notice">Not: Web NFC, Türkiye Cumhuriyeti kimlik kartının güvenli eID verilerini tek başına doğrulamaz. Gerçek kimlik doğrulaması için yetkili bir altyapı gerekir.</div>
+</section>
+
+<section class="card step" id="step2">
+  <div class="icon">15+</div>
+  <div class="eyebrow">Adım 2 · Yaş kontrolü</div>
+  <h1>Yaşını doğrula</h1>
+  <p>Kimliğindeki doğum tarihi yetkili doğrulama servisi tarafından kontrol edilir. 15 yaşından büyük değilsen doğrulama burada sonlandırılır.</p>
+  <div class="status show" id="ageStatus">Kimlik doğrulama sunucusundan sonuç bekleniyor.</div>
+  <button class="action" id="ageContinue">Sonucu kontrol et</button>
+  <div class="notice">Gerçek yaş kararı sunucu tarafında, doğrulanmış kimlik verisi üzerinden verilmelidir.</div>
+</section>
+
+<section class="card step" id="step3">
+  <div class="icon">⌾</div>
+  <div class="eyebrow">Adım 3 · Yüz doğrulama</div>
+  <h1>Sen olduğunu doğrula</h1>
+  <p>Telefonunun kamerasını kullanarak kısa bir selfie kontrolü başlatabilirsin. Kimlik kartının sana ait olup olmadığı güvenli bir doğrulama servisi tarafından kontrol edilmelidir.</p>
+  <div class="camera" id="cameraBox"><video id="cameraVideo" autoplay playsinline muted></video><span>⌾</span><small>Yüzünü çerçevenin içine getir</small></div>
+  <button class="action" id="selfieBtn">Kamerayı aç</button>
+  <button class="secondary" id="finishBtn" disabled>Doğrulama servisine gönder</button>
+  <div class="status" id="selfieStatus"></div>
+</section>
+
+<section class="card step success" id="step4">
+  <div class="check">✓</div>
+  <div class="eyebrow">Doğrulama tamamlandı</div>
+  <h1>Doğrulama tamamlandı</h1>
+  <p>Bu ekran yalnızca yetkili doğrulama sunucusundan başarılı sonuç alındığında gösterilmelidir.</p>
+  <button class="action" onclick="location.reload()">Baştan başla</button>
+</section>
+</main>
+
+<footer>Bu arayüz bir prototiptir. Gerçek kimlik/NFC ve biyometrik doğrulama için yasal ve güvenli altyapı kullanılmalıdır.</footer>
+</div>
+
+<script>
+const steps=[...document.querySelectorAll('.step')];
+const dots=[d1,d2,d3];
+function show(n){
+  steps.forEach((s,i)=>s.classList.toggle('active',i===n-1));
+  dots.forEach((d,i)=>{d.classList.toggle('done',i<n-1);d.classList.toggle('current',i===n-1)});
+}
+function msg(id,text){
+  const el=document.getElementById(id); el.textContent=text; el.classList.add('show');
+}
+nfcBtn.onclick=async()=>{
+  msg('nfcStatus','NFC desteği kontrol ediliyor…');
+  if(!('NDEFReader' in window)){
+    msg('nfcStatus','Bu tarayıcı Web NFC desteklemiyor. Android Chrome gibi desteklenen bir cihazda deneyebilirsin.');
+    return;
+  }
+  try{
+    const reader=new NDEFReader();
+    await reader.scan();
+    msg('nfcStatus','NFC hazır. Kartı telefonun NFC alanına yaklaştır.');
+    reader.onreading=()=>{
+      msg('nfcStatus','NFC kartı algılandı. Ancak kimlik doğrulama verisi bu sayfada güvenilir biçimde doğrulanamaz.');
+    };
+  }catch(error){
+    msg('nfcStatus','NFC erişimi başlatılamadı. Tarayıcı iznini ve cihaz desteğini kontrol et.');
+  }
+};
+ageContinue.onclick=()=>msg('ageStatus','Gerçek sonuç için doğrulama sunucusundan imzalı bir yaş sonucu alınmalıdır. Bu statik sayfa kendi başına yaş kararı vermez.');
+selfieBtn.onclick=async()=>{
+  if(!navigator.mediaDevices?.getUserMedia){
+    msg('selfieStatus','Bu cihaz/tarayıcı kamera erişimini desteklemiyor.');
+    return;
+  }
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+    cameraVideo.srcObject=stream;
+    cameraBox.classList.add('live');
+    selfieBtn.textContent='Kamera açık';
+    selfieBtn.disabled=true;
+    finishBtn.disabled=false;
+    msg('selfieStatus','Kamera açıldı. Yüz eşleştirmesi bu sayfada yapılmıyor; güvenli bir doğrulama servisi gerekir.');
+  }catch(error){
+    msg('selfieStatus','Kamera izni verilmedi veya kamera kullanılamıyor.');
+  }
+};
+finishBtn.onclick=()=>{
+  msg('selfieStatus','Gönderim noktası hazır. Bu statik GitHub Pages sürümünde kimlik veya biyometrik veri sunucuya gönderilmiyor.');
+};
+</script>
+</body>
+</html>
